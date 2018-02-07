@@ -18,6 +18,8 @@ package com.vaadin.flow.demo.minesweeper.component;
 import java.util.List;
 import java.util.Optional;
 
+import org.vaadin.artur.github_corner.GitHubCorner;
+
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.demo.minesweeper.component.component.Minesweeper;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -47,7 +49,7 @@ public class MainView extends Div implements BeforeEnterObserver {
         double mineDensity = getParam(event, "mineDensity", 20) / 100.0;
         int rows = getParam(event, "rows", 10);
         int cols = getParam(event, "cols", 10);
-
+        add(new GitHubCorner("Artur-", "minesweeper"));
         add(new Minesweeper(seed, mineDensity, rows, cols));
     }
 
