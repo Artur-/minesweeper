@@ -15,143 +15,120 @@
  */
 package org.vaadin.artur.minesweeper.component;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.vaadin.flow.component.EventData;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.Notification.Position;
-import com.vaadin.flow.component.polymertemplate.EventHandler;
-import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 
+import org.vaadin.artur.minesweeper.FailEvent;
+import org.vaadin.artur.minesweeper.SuccessEvent;
+import org.vaadin.artur.minesweeper.component.Cell.CellClickEvent;
 import org.vaadin.artur.minesweeper.component.data.MineFieldData;
 import org.vaadin.artur.minesweeper.component.data.Point;
 
 /**
  * The Minesweeper main UI component.
  */
-@Tag("mine-field")
-@HtmlImport("mine-field.html")
-public class MineField extends PolymerTemplate<MinesweeperModel> {
+@Tag("table")
+public class MineField extends Component implements HasComponents {
 
-    private final MineFieldData mineFieldData;
-    private boolean active = true;
+    private MineFieldData mineFieldData = new MineFieldData();
+    boolean playing = true;
 
     /**
      * Creates a component and sets up a minefield using the given parameters.
      *
-     * @param seed
-     *            the random seed to use when placing mines
-     * @param mineDensity
-     *            the ratio of mines to cells, between 0 and 1
-     * @param rows
-     *            the number of rows in the minefield
-     * @param cols
-     *            the number of columns in the minefield
+     * @param seed        the random seed to use when placing mines
+     * @param mineDensity the ratio of mines to cells, between 0 and 1
+     * @param rows        the number of rows in the minefield
+     * @param cols        the number of columns in the minefield
      */
     public MineField(long seed, double mineDensity, int rows, int cols) {
-        mineFieldData = new MineFieldData(rows, cols, seed, mineDensity);
-        initModel();
+        mineFieldData.init(rows, cols, seed, mineDensity);
+        init();
     }
 
-    @EventHandler
-    private void handleClick(
-            @EventData("event.model.parentModel.index") int row,
-            @EventData("event.model.index") int col) {
-        if (!active) {
-            return;
+    /**
+     * Initializes the component hierarchy.
+     */
+    private void init() {
+        for (int rowIndex = 0; rowIndex < mineFieldData.getRows(); rowIndex++) {
+            Row row = new Row();
+            for (int colIndex = 0; colIndex < mineFieldData.getCols(); colIndex++) {
+                Cell cell = new Cell();
+                row.add(cell);
+                cell.addCellClickListener(this::cellClick);
+            }
+            add(row);
         }
-        Cell cell = getModelCell(row, col);
+    }
+
+    /**
+     * Called whenever a cell click event occurs.
+     *
+     * @param e the cell click event object
+     */
+    private void cellClick(CellClickEvent e) {
+        if (!playing)
+            return;
+        Cell cell = e.getSource();
         if (cell.isMarked()) {
-            // Unmark cell on click
-            cell.setMarked(false);
             return;
         }
-        if (mineFieldData.isMine(row, col)) {
+
+        if (mineFieldData.isMine(cell.getRow(), cell.getCol())) {
             boom();
             revealAll();
         } else {
-            reveal(row, col);
-            if (isAllNonMinesRevealed()) {
+            reveal(cell);
+            if (isAllRevealed()) {
                 success();
-                revealAll();
             }
         }
-    }
-
-    @EventHandler
-    private void handleRightClick(
-            @EventData("event.model.parentModel.index") int row,
-            @EventData("event.model.index") int col) {
-        Cell cell = getModelCell(row, col);
-        cell.setMarked(!cell.isMarked());
-    }
-
-    private void initModel() {
-        List<List<Cell>> cells = new ArrayList<>();
-        for (int row = 0; row < mineFieldData.getRows(); row++) {
-            List<Cell> rowCells = new ArrayList<>();
-            for (int col = 0; col < mineFieldData.getCols(); col++) {
-                rowCells.add(new Cell());
-            }
-            cells.add(rowCells);
-        }
-
-        getModel().setCells(cells);
-    }
-
-    private Cell getModelCell(int row, int col) {
-        return getModel().getCells().get(row).get(col);
     }
 
     /**
      * Shows a message indicating mine explosion and failure.
      */
-    private void boom() {
-        active = false;
-        Notification n = Notification.show("BOOM! Reload to try again", 100000,
-                Position.MIDDLE);
-        //n.addClassName("boom");
+    public void boom() {
+        getEventBus().fireEvent(new FailEvent(this));
+        playing = false;
     }
 
     /**
      * Shows a message indicating the mine field was successfully cleared.
      */
     private void success() {
-        active = false;
-        Notification n = Notification.show("Congratulations!", 100000,
-                Position.MIDDLE);
-        //n.addClassName("success");
+        getEventBus().fireEvent(new SuccessEvent(this));
+        playing = false;
     }
 
     /**
      * Reveals the given cell.
      *
-     * @param row
-     *            the row of the cell to reveal
-     * @param col
-     *            the column of the cell to reveal
+     * @param cell the cell to reveal
      */
-    public void reveal(int row, int col) {
-        Cell cell = getModelCell(row, col);
+    public void reveal(Cell cell) {
         if (cell.isRevealed()) {
             // Already revealed
             return;
         }
 
-        boolean mine = mineFieldData.isMine(row, col);
-        cell.setRevealed(true);
-        cell.setMine(mine);
+        int row = cell.getRow();
+        int col = cell.getCol();
+
+        boolean mine = mineFieldData.isMine(row, cell.getCol());
+        cell.reveal(mine);
         if (!mine) {
+
             int count = mineFieldData.getNearbyCount(row, col);
             if (count > 0) {
                 cell.setText(Integer.toString(count));
             } else {
                 // Autoreveal
                 for (Point p : mineFieldData.getNearbyPoints(row, col)) {
-                    reveal(p.getRow(), p.getCol());
+                    reveal(getCell(p.getRow(), p.getCol()));
                 }
             }
         }
@@ -162,11 +139,11 @@ public class MineField extends PolymerTemplate<MinesweeperModel> {
      *
      * @return true if all cells have been revealed, false otherwise.
      */
-    private boolean isAllNonMinesRevealed() {
+    private boolean isAllRevealed() {
         for (int row = 0; row < mineFieldData.getRows(); row++) {
             for (int col = 0; col < mineFieldData.getCols(); col++) {
-                if (!getModelCell(row, col).isRevealed()
-                        && !mineFieldData.isMine(row, col)) {
+                Cell cell = getCell(row, col);
+                if (!cell.isRevealed() && !mineFieldData.isMine(row, col)) {
                     return false;
                 }
             }
@@ -178,10 +155,28 @@ public class MineField extends PolymerTemplate<MinesweeperModel> {
      * Reveal all cells, regardless of whether they contain mines or not.
      */
     private void revealAll() {
-        for (int row = 0; row < mineFieldData.getRows(); row++) {
-            for (int column = 0; column < mineFieldData.getCols(); column++) {
-                reveal(row, column);
+        for (int r = 0; r < mineFieldData.getRows(); r++) {
+            for (int c = 0; c < mineFieldData.getCols(); c++) {
+                reveal(getCell(r, c));
             }
         }
     }
+
+    /**
+     * Gets the cell component for the given cell.
+     *
+     * @param row the row coordinate
+     * @param col the column coordinate
+     * @return the cell component for the given coordinates
+     */
+    private Cell getCell(int row, int col) {
+        return (Cell) getElement().getChild(row).getChild(col).getComponent().get();
+    }
+
+    public void addListeners(ComponentEventListener<SuccessEvent> successListener,
+            ComponentEventListener<FailEvent> failListener) {
+        addListener(SuccessEvent.class, successListener);
+        addListener(FailEvent.class, failListener);
+    }
+
 }

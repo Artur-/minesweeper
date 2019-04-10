@@ -26,9 +26,10 @@ import java.util.Set;
  */
 public class MineFieldData implements Serializable {
 
-    private final Set<Point> mines;
-    private final int rows;
-    private final int cols;
+    private Set<Point> mines;
+    private int rows;
+    private int cols;
+    private int numberOfMines;
 
     /**
      * Initializes the mine field and randomly places mines.
@@ -47,16 +48,18 @@ public class MineFieldData implements Serializable {
      *            a number between 0 and 1, describing the approximate fraction
      *            of the cells which should contain a mine
      */
-    public MineFieldData(int rows, int cols, long seed, double mineDensity) {
+    public void init(int rows, int cols, long seed, double mineDensity) {
         Random random = new Random(seed);
         this.rows = rows;
         this.cols = cols;
+        numberOfMines = 0;
 
         mines = new HashSet<>();
-        for (int row = 0; row < rows; row++) {
-            for (int column = 0; column < cols; column++) {
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
                 if (random.nextDouble() > (1 - mineDensity)) {
-                    mines.add(new Point(row, column));
+                    mines.add(new Point(r, c));
+                    numberOfMines++;
                 }
             }
         }
@@ -163,7 +166,7 @@ public class MineFieldData implements Serializable {
      * @return the number of mines in the mine field
      */
     public int getNumberOfMines() {
-        return mines.size();
+        return numberOfMines;
     }
 
 }
