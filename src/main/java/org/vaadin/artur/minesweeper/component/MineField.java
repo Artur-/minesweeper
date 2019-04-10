@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.vaadin.flow.demo.minesweeper.component.component;
+package org.vaadin.artur.minesweeper.component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,26 +25,19 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.polymertemplate.EventHandler;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
-import com.vaadin.flow.demo.minesweeper.component.component.Minesweeper.MinesweeperModel;
-import com.vaadin.flow.demo.minesweeper.component.data.MineFieldData;
-import com.vaadin.flow.demo.minesweeper.component.data.Point;
-import com.vaadin.flow.templatemodel.TemplateModel;
+
+import org.vaadin.artur.minesweeper.component.data.MineFieldData;
+import org.vaadin.artur.minesweeper.component.data.Point;
 
 /**
  * The Minesweeper main UI component.
  */
-@Tag("mine-sweeper")
-@HtmlImport("minesweeper.html")
-public class Minesweeper extends PolymerTemplate<MinesweeperModel> {
+@Tag("mine-field")
+@HtmlImport("mine-field.html")
+public class MineField extends PolymerTemplate<MinesweeperModel> {
 
     private final MineFieldData mineFieldData;
     private boolean active = true;
-
-    public interface MinesweeperModel extends TemplateModel {
-        void setCells(List<List<Cell>> cells);
-
-        List<List<Cell>> getCells();
-    }
 
     /**
      * Creates a component and sets up a minefield using the given parameters.
@@ -58,7 +51,7 @@ public class Minesweeper extends PolymerTemplate<MinesweeperModel> {
      * @param cols
      *            the number of columns in the minefield
      */
-    public Minesweeper(long seed, double mineDensity, int rows, int cols) {
+    public MineField(long seed, double mineDensity, int rows, int cols) {
         mineFieldData = new MineFieldData(rows, cols, seed, mineDensity);
         initModel();
     }
@@ -120,7 +113,7 @@ public class Minesweeper extends PolymerTemplate<MinesweeperModel> {
         active = false;
         Notification n = Notification.show("BOOM! Reload to try again", 100000,
                 Position.MIDDLE);
-        n.addClassName("boom");
+        //n.addClassName("boom");
     }
 
     /**
@@ -130,7 +123,7 @@ public class Minesweeper extends PolymerTemplate<MinesweeperModel> {
         active = false;
         Notification n = Notification.show("Congratulations!", 100000,
                 Position.MIDDLE);
-        n.addClassName("success");
+        //n.addClassName("success");
     }
 
     /**

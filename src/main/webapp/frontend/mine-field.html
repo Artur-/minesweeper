@@ -1,7 +1,7 @@
 <link rel="import" href="bower_components/polymer/polymer-element.html">
 <link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
 
-<dom-module id="mine-sweeper">
+<dom-module id="mine-field">
   <template>
   <style>
         .table {
@@ -47,7 +47,7 @@
 
     <script>
     class MineSweeper extends Polymer.Element {
-	  static get is() { return 'mine-sweeper'; }
+	  static get is() { return 'mine-field'; }
 
 	  handleRightClick (event) {
           event.preventDefault();

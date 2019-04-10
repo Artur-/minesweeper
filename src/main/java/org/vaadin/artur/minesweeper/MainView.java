@@ -13,15 +13,15 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.vaadin.flow.demo.minesweeper.component;
+package org.vaadin.artur.minesweeper;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.vaadin.artur.github_corner.GitHubCorner;
+import org.vaadin.artur.minesweeper.component.MineField;
 
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.demo.minesweeper.component.component.Minesweeper;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
@@ -32,7 +32,6 @@ import com.vaadin.flow.theme.lumo.Lumo;
  * Main view
  */
 @Route(value = "")
-@Theme(Lumo.class)
 public class MainView extends Div implements BeforeEnterObserver {
 
     private static int getParam(BeforeEnterEvent event, String name,
@@ -50,7 +49,7 @@ public class MainView extends Div implements BeforeEnterObserver {
         int rows = getParam(event, "rows", 10);
         int cols = getParam(event, "cols", 10);
         add(new GitHubCorner("Artur-", "minesweeper"));
-        add(new Minesweeper(seed, mineDensity, rows, cols));
+        add(new MineField(seed, mineDensity, rows, cols));
     }
 
 }

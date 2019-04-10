@@ -1,4 +1,4 @@
-package com.vaadin.flow.demo.minesweeper.component.component;
+package org.vaadin.artur.minesweeper.component;
 
 public class Cell {
 

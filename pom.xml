@@ -8,62 +8,45 @@
 	<name>Minesweeper</name>
 	<packaging>war</packaging>
 
+
 	<properties>
-		<vaadin.version>10.0.0.alpha16</vaadin.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<failOnMissingWebXml>false</failOnMissingWebXml>
-		<jetty.version>9.3.7.v20160115</jetty.version>
 	</properties>
-	<repositories>
-		<repository>
-			<id>vaadin-prerelease</id>
-			<url>http://maven.vaadin.com/vaadin-prereleases</url>
-		</repository>
-		<repository>
-			<id>vaadin-addons</id>
-			<url>http://maven.vaadin.com/vaadin-addons</url>
-		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>vaadin-prerelease</id>
-			<url>http://maven.vaadin.com/vaadin-prereleases</url>
-		</pluginRepository>
-	</pluginRepositories>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-bom</artifactId>
-				<version>${vaadin.version}</version>
+				<version>14.0.0.alpha1</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
+	<repositories>
+		<repository>
+			<id>vaadin-addons</id>
+			<url>http://maven.vaadin.com/vaadin-addons</url>
+		</repository>
+		<repository>
+			<id>vaadin-prereleases</id>
+			<name>Vaadin Pre-releases</name>
+			<url>https://maven.vaadin.com/vaadin-prereleases</url>
+		</repository>
+	</repositories>
 	<dependencies>
-
-		<!-- Vaadin dependencies -->
 		<dependency>
 			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-testbench</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-components-testbench</artifactId>
+			<artifactId>vaadin</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
-			<version>3.1.0</version>
+			<version>3.0.1</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -71,45 +54,19 @@
 			<artifactId>github-corner</artifactId>
 			<version>1.0.0</version>
 		</dependency>
-
 	</dependencies>
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.eclipse.jetty</groupId>
-				<artifactId>jetty-maven-plugin</artifactId>
-				<version>${jetty.version}</version>
-			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-maven-plugin</artifactId>
+					<version>9.4.15.v20190215</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
-	<profiles>
-		<profile>
-			<id>production</id>
-			<dependencies>
-				<dependency>
-					<groupId>com.vaadin</groupId>
-					<artifactId>flow-server-production-mode</artifactId>
-				</dependency>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>com.vaadin</groupId>
-						<artifactId>flow-maven-plugin</artifactId>
-						<version>1.0.0.alpha19</version>
-						<executions>
-							<execution>
-								<goals>
-									<goal>copy-production-files</goal>
-									<goal>package-for-production</goal>
-								</goals>
-							</execution>
-						</executions>
-
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>
