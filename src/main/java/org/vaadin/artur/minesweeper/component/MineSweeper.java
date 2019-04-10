@@ -4,9 +4,13 @@ import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.WebComponentExporter;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.webcomponent.WebComponentDefinition;
+import com.vaadin.flow.dom.Style;
 
+@StyleSheet("frontend://minesweeper.css")
 public class MineSweeper extends Div {
 
     @Tag("mine-sweeper")
@@ -30,7 +34,6 @@ public class MineSweeper extends Div {
     private int rows = 10, cols = 10;
 
     public MineSweeper() {
-        getStyle().set("display", "inline-block");
         reinit();
     }
 
@@ -39,7 +42,6 @@ public class MineSweeper extends Div {
         this.mineDensity = mineDensity;
         this.rows = rows;
         this.cols = cols;
-        getStyle().set("display", "inline-block");
         reinit();
     }
 
@@ -54,6 +56,8 @@ public class MineSweeper extends Div {
     }
 
     private void reinit() {
+        getStyle().set("display", "inline-block");
+        getStyle().set("position", "relative");
         removeAll();
 
         mineField = new MineField(seed, mineDensity, rows, cols);
@@ -62,7 +66,23 @@ public class MineSweeper extends Div {
             showMessage("Congratulations!", "Play again");
         }, e -> {
             // On failure
-            showMessage("BOOM!", "Try again");
+            Image fail = new Image(
+                    "https://upload.wikimedia.org/wikipedia/commons/7/79/Operation_Upshot-Knothole_-_Badger_001.jpg",
+                    "");
+            Style s = fail.getStyle();
+            s.set("position", "absolute");
+            s.set("width", "100%");
+            s.set("height", "100%");
+            s.set("top", "0");
+            s.set("opacity", "0.5");
+
+            add(fail);
+
+            Button b = new Button("Try again", ee -> {
+                reinit();
+            });
+            b.getStyle().set("position", "absolute");
+            add(b);
         });
         addComponentAsFirst(mineField);
     }

@@ -76,7 +76,12 @@ public class MineField extends Component implements HasComponents {
         if (cell.isMarked()) {
             return;
         }
-
+        if (isFirstClick()) {
+            while (mineFieldData.isMine(cell.getRow(), cell.getCol())) {
+                // Don't disappoint the user by failing immediately
+                mineFieldData.shuffle();
+            }
+        }
         if (mineFieldData.isMine(cell.getRow(), cell.getCol())) {
             boom();
             revealAll();
@@ -86,6 +91,18 @@ public class MineField extends Component implements HasComponents {
                 success();
             }
         }
+    }
+
+    private boolean isFirstClick() {
+        for (int row = 0; row < mineFieldData.getRows(); row++) {
+            for (int col = 0; col < mineFieldData.getCols(); col++) {
+                Cell cell = getCell(row, col);
+                if (cell.isRevealed()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**

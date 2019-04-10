@@ -30,30 +30,32 @@ public class MineFieldData implements Serializable {
     private int rows;
     private int cols;
     private int numberOfMines;
+    private Random random;
+    private double mineDensity;
 
     /**
      * Initializes the mine field and randomly places mines.
      * <p>
      * The random seed is used for placing the mines, making it possible to
-     * reproduce the same mine layout by passing the same seed and also
-     * otherwise the same parameters.
+     * reproduce the same mine layout by passing the same seed and also otherwise
+     * the same parameters.
      *
-     * @param rows
-     *            the number rows in the field
-     * @param cols
-     *            the number of columns in the field
-     * @param seed
-     *            a random seed used for placing mines
-     * @param mineDensity
-     *            a number between 0 and 1, describing the approximate fraction
-     *            of the cells which should contain a mine
+     * @param rows        the number rows in the field
+     * @param cols        the number of columns in the field
+     * @param seed        a random seed used for placing mines
+     * @param mineDensity a number between 0 and 1, describing the approximate
+     *                    fraction of the cells which should contain a mine
      */
     public void init(int rows, int cols, long seed, double mineDensity) {
-        Random random = new Random(seed);
+        random = new Random(seed);
         this.rows = rows;
         this.cols = cols;
+        this.mineDensity = mineDensity;
         numberOfMines = 0;
+        shuffle();
+    }
 
+    public void shuffle() {
         mines = new HashSet<>();
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
@@ -68,10 +70,8 @@ public class MineFieldData implements Serializable {
     /**
      * Retrieves a set of coordinates of the cells surrounding the given cell.
      *
-     * @param row
-     *            the row of the cell to lookup
-     * @param col
-     *            the column of the cell to lookup
+     * @param row the row of the cell to lookup
+     * @param col the column of the cell to lookup
      * @return a set of points referring to the neighboring cells
      */
     public Set<Point> getNearbyPoints(int row, int col) {
@@ -98,10 +98,8 @@ public class MineFieldData implements Serializable {
     /**
      * Gets the total number of mines in the neighboring cells.
      *
-     * @param row
-     *            the row of the cell to lookup
-     * @param col
-     *            the column of the cell to lookup
+     * @param row the row of the cell to lookup
+     * @param col the column of the cell to lookup
      * @return the sum of mines in nearby cells
      */
     public int getNearbyCount(int row, int col) {
@@ -139,10 +137,8 @@ public class MineFieldData implements Serializable {
     /**
      * Checks whether the given cell contains a mine.
      *
-     * @param row
-     *            the row of the cell to lookup
-     * @param col
-     *            the column of the cell to lookup
+     * @param row the row of the cell to lookup
+     * @param col the column of the cell to lookup
      * @return true if the cell contains a mine, false otherwise
      */
     public boolean isMine(int row, int col) {
@@ -152,8 +148,7 @@ public class MineFieldData implements Serializable {
     /**
      * Checks whether the given cell contains a mine.
      *
-     * @param point
-     *            the row and column of the cell to lookup
+     * @param point the row and column of the cell to lookup
      * @return true if the cell contains a mine, false otherwise
      */
     private boolean isMine(Point point) {
